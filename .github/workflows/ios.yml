@@ -1,0 +1,28 @@
+name: Publish to App Store Connect
+
+on:
+  push:
+  branches:
+    - main
+
+
+jobs:
+  ios_deploy_testflight:
+    runs-on:  macos-13
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+
+      - name: Install dependencies and lint check
+        run: |
+          flutter clean
+          flutter pub get
+          dart analyze --fatal-infos
