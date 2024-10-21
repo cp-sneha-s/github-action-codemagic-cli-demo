@@ -10,7 +10,7 @@ jobs:
   ios_deploy_testflight:
     runs-on:  macos-13
     env:
-      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.ISSUER_ID }}
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
       APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
       APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
       APP_STORE_APP_ID: ${{ secrets.APP_STORE_APP_ID }}
@@ -71,7 +71,6 @@ jobs:
         
     - name: Upload to App Store Connect
       run: |
-        echo "App store Connect issuer id  ${APP_STORE_CONNECT_ISSUER_ID}"
         APP_FILE=$(find $(pwd)  -name "*.ipa")
         app-store-connect publish \
         --path "$APP_FILE"
