@@ -9,6 +9,14 @@ on:
 jobs:
   ios_deploy_testflight:
     runs-on:  macos-13
+    env:
+      APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+      APP_STORE_CONNECT_KEY_IDENTIFIER: ${{ secrets.APP_STORE_CONNECT_KEY_IDENTIFIER }}
+      APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+      APP_STORE_APP_ID: ${{ secrets.APP_STORE_APP_ID }}
+      DIST_CERTIFICATE: ${{ secrets.DIST_CERTIFICATE_BASE64 }}
+      DIST_CERTIFICATE_PASSWORD: ${{ secrets.DIST_CERTIFICATE_PASSWORD }}
+      PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE_BASE64 }}
 
     steps:
 
@@ -27,3 +35,27 @@ jobs:
         flutter clean
         flutter pub get
         dart analyze --fatal-infos
+
+    - name: Install Codemagic CLI tools
+      run: pip install codemagic-cli-tools
+
+    - name: Setup Code signing settings on Xcode project
+      run: xcode-project use-profiles
+
+    - name: Build ipa for Distribution
+      run: |
+        file='VERSION'
+        fileData=`cat $file`
+        IFS='.'
+        read -a versionValue <<< "$fileData"
+        buildNumber=$(( ${versionValue[0]} * 1000000 + ${versionValue[1]} * 10000 + ${{ github.run_number }} ))
+        IFS=''
+        buildName="${versionValue[0]}.${versionValue[1]}.${{ github.run_number }}"
+        echo "Uploading build $buildName"
+        flutter build ipa --release --build-number=$buildNumber --build-name=$buildName --export-options-plist=$HOME/export_options.plist
+        
+    - name: Upload to App Store Connect
+      run: |
+        APP_FILE=$(find $(pwd)  -name "*.ipa")
+        app-store-connect publish \
+        --path "$APP_FILE"
