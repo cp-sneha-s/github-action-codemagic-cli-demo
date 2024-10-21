@@ -51,8 +51,8 @@ jobs:
 
     - name: Set up Code signing settings
       run: |
-        echo $DIST_CERTIFICATE | base64 --decode > tmp/certificate.p12
-        keychain add-certificates --certificate tmp/certificate.p12 --certificate-password $DIST_CERTIFICATE_PASSWORD
+        echo $DIST_CERTIFICATE | base64 --decode > certificate.p12
+        keychain add-certificates --certificate certificate.p12 --certificate-password $DIST_CERTIFICATE_PASSWORD
 
     - name: Setup Code signing settings on Xcode project
       run: xcode-project use-profiles
