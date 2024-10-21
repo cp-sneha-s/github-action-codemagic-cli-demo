@@ -71,7 +71,7 @@ jobs:
         
     - name: Upload to App Store Connect
       run: |
-        echo "App store Connect issuer id  $APP_STORE_CONNECT_ISSUER_ID"
+        echo "App store Connect issuer id  ${APP_STORE_CONNECT_ISSUER_ID}"
         APP_FILE=$(find $(pwd)  -name "*.ipa")
         app-store-connect publish \
         --path "$APP_FILE"
